@@ -45,6 +45,17 @@ module RecurringSelect
     params[:interval] = params[:interval].to_i if params[:interval]
     params[:week_start] = params[:week_start].to_i if params[:week_start]
 
+    if !(numeric_until = params[:until].to_i).zero?
+      params[:until] = Time.zone.at(numeric_until).change(hour: 23, min: 59, sec: 59)
+    end
+
+    # Count/Until should be mutually exclusive
+    if numeric_until.zero? && !(numeric_count = params[:count].to_i).zero?
+      params[:count] = numeric_count
+    else
+      params.delete(:count)
+    end
+
     params[:validations] ||= {}
     params[:validations].symbolize_keys!
 
